@@ -3,22 +3,34 @@
         <title>Sacha's personal tracking interface</title>
         <style type="text/css">
          button { padding: 20px; font-size: large; width: 45%; display: inline-block  }
-        </style>
+         #library-books li { padding: 20px; width: 100%; border: 1px solid #ccc; list-style-type: none }
+         #library-books { list-style-time: none; margin-left: 0 }
+         </style>
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     </head>
     <body>
         <div id="feedback"></div>
         <!-- For making it easy to track things -->
         <div class="screen" id="main-screen">
-        <button class="note">Do</button>
-        <button class="note">Think</button>
-        <button class="note">Note</button>
-        <button class="note">Journal</button>
-        <button class="switch-screen" data-screen="track-screen">Track</button>
-        <button class="switch-screen" data-screen="play-screen">Play</button>
-        <button class="switch-screen" data-screen="eat-screen">Eat</button>
-        <button class="switch-screen" data-screen="energy-screen">Energy</button>
-        <button id="reload">Reload</button>
+            <button class="note">Do</button>
+            <button class="note">Think</button>
+            <button class="note">Note</button>
+            <button class="note">Journal</button>
+            <button id="library">Library</button>
+            <button class="switch-screen" data-screen="track-screen">Track</button>
+            <button class="switch-screen" data-screen="play-screen">Play</button>
+            <button class="switch-screen" data-screen="eat-screen">Eat</button>
+            <button class="switch-screen" data-screen="energy-screen">Energy</button>
+            <button id="reload">Reload</button>
+        </div>
+        <div class="screen" id="library-screen">
+            <button class="update-qa">Nonfiction</button>
+            <button class="update-qa">Play Fiction</button>
+
+            <ul id="library-books">
+            </ul>
+            <button class="switch-screen"
+                    data-screen="main-screen">Back</button>
         </div>
         <div class="screen" id="play-screen">
             <button class="play">Persona 3</button>
@@ -62,9 +74,14 @@
             <button class="switch-screen" data-screen="main-screen">Back</button>
         </div>
         <script>
-         function updateQuantifiedAwesome(category) {
-             performTask('Update QA', null, category);
-             hideScene('Test');
+         function updateQuantifiedAwesome(category, note) {
+             setWifi(true);
+             if (note) {
+                 category = category + '|' + note;
+             }
+             browseURL('http://quantifiedawesome.com/time/track?category=' + encodeURIComponent(category) + '&auth_token=' + global('QATOKEN'));
+             hideScene('Test View');
+             wait(2000);
          }
 
          function showFeedback(s) {
@@ -107,6 +124,29 @@
              performTask('Play', null, $(this).text());
          });
 
+         $('#library').click(function() {
+             switchScreen('library-screen');
+             showFeedback('Attempting to load...');
+             $.ajax({url: 'http://quantifiedawesome.com/library_items/current.json?auth_token=' + global('QATOKEN'), success: function(data, status, jq) {
+                 showFeedback('Retrieved: ', data.length);
+                 if (!data) { return; }
+                 var output = '';
+                 for (var i = 0; i < data.length; i++) {
+                     output += '<li data-dewey="' + data[i]['dewey'] + '">' + data[i]['title'] + '</li>';
+                 }
+                 $('#library-books').html(output);
+                 $('#library-books li').click(function() {
+                     if ($(this).attr('data-dewey').match(/FICTION/)) {
+                         updateQuantifiedAwesome('Play Fiction', $(this).text());
+                     } else {
+                         updateQuantifiedAwesome('Nonfiction', $(this).text());
+                     }
+                     createEvernote('Read: ' + $(this).text());
+                 });
+             }, error: function(data, status, jq) {
+                 showFeedback('Error: ' + data + ' - ' + status);
+             }});
+         });
          switchScreen('main-screen');
 
          </script>
