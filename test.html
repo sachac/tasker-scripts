@@ -3,8 +3,12 @@
         <title>Sacha's personal tracking interface</title>
         <style type="text/css">
          button { padding: 20px; font-size: large; width: 45%; display: inline-block  }
-         #library-books li { padding: 20px; width: 100%; border: 1px solid #ccc; list-style-type: none }
-         #library-books { list-style-time: none; margin-left: 0 }
+         #library-books li { padding: 20px; width: 100%; border: 1px solid #ccc; list-style-type: none; margin-left: 0 }
+         #library-books { list-style-time: none; margin-left: 0; padding-left: 0 }
+         .due { color: red; font-weight: bold }
+         .due-date { font-size: small }
+         .nonfiction { background-color: lightblue }
+         .fiction { background-color: lightgreen }
          </style>
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     </head>
@@ -131,17 +135,31 @@
                  showFeedback('Retrieved: ', data.length);
                  if (!data) { return; }
                  var output = '';
+                 var today = (new Date()).toISOString().split('T')[0]
                  for (var i = 0; i < data.length; i++) {
-                     output += '<li data-dewey="' + data[i]['dewey'] + '">' + data[i]['title'] + '</li>';
+                     var classes = '';
+                     if (data[i]['dewey'].match(/FICTION/)) {
+                         classes = 'fiction';
+                     } else {
+                         classes = 'nonfiction';
+                     }
+                     if (data[i]['due'] <= today) {
+                         classes += ' due';
+                     }
+                     output += '<li data-dewey="' + data[i]['dewey'] + '" data-author="'
+                             + data[i]['author'] + '" class="' + classes
+                             + '"><div class="title">' + data[i]['title'] + '</div>'
+                             + '<div class="due-date">' + data[i]['due'] + '</div>'
+                             + '</li>';
                  }
                  $('#library-books').html(output);
                  $('#library-books li').click(function() {
-                     if ($(this).attr('data-dewey').match(/FICTION/)) {
-                         updateQuantifiedAwesome('Play Fiction', $(this).text());
-                     } else {
+                     if ($(this).attr('classes').match(/nonfiction/)) {
                          updateQuantifiedAwesome('Nonfiction', $(this).text());
+                     } else {
+                         updateQuantifiedAwesome('Play Fiction', $(this).text());
                      }
-                     createEvernote('Read: ' + $(this).text());
+                     createEvernote('Read: ' + $(this).text() + ' (' + $(this).attr('data-author') + ') -- ' + $(this).attr('data-dewey'));
                  });
              }, error: function(data, status, jq) {
                  showFeedback('Error: ' + data + ' - ' + status);
