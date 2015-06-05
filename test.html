@@ -77,7 +77,8 @@
              switchScreen($(this).attr('data-screen'));
          });
          function createEvernote(title, body) {
-             sendIntent('com.evernote.action.CREATE_NEW_NOTE', 'activity', '', '', 'none', '', '', ['android.intent.extra.TITLE:' + (title || ''), 'android.intent.extra.TEXT:' + (body || '')]);
+             sendIntent('com.evernote.action.CREATE_NEW_NOTE', 'activity',
+                        '', '', 'none', '', '', ['android.intent.extra.TITLE:' + (title || ''), 'android.intent.extra.TEXT:' + (body || '')]);
          }
          $('.note').click(function() {
              createEvernote($(this).text());
