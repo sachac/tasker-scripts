@@ -3,26 +3,18 @@
         <style type="text/css">
          button { padding: 20px; font-size: large; width: 45%; display: inline-block  }
         </style>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     </head>
     <body style="">
         <div id="feedback">Starting...</div>
         <button onclick="javascript:loadApp('Dropsync')">Do</button>
         <button onclick="javascript:performTask('Track')">Think</button>
-        <!-- <button id="track">Track</button>
-        <button id="sync">Sync</button>
+        <button id="track">Track</button>
         <script>
-         flash('Hello world');
-         flash('Hello world: ' + $('#feedback').text());
-
          $('#track').click(function() {
              $('#feedback').html('Clicked on track');
-             performTask('Track', 1, null, null);
+             performTask('Track');
          });
-         $('#sync').click(function() {
-             $('#feedback').html('Clicked on sync');
-             performTask('Reload Test', 1, null, null);
-         });
-         $('#feedback').html('Ready');
-         </script> -->
+         </script>
     </body>
 </html>
