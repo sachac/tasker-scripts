@@ -7,14 +7,105 @@
     </head>
     <body style="">
         <div id="feedback">Starting...</div>
-        <button onclick="javascript:loadApp('Dropsync')">Do</button>
-        <button onclick="javascript:performTask('Track')">Think</button>
-        <button id="track">Track</button>
+        <div class="screen" id="main-screen">
+        <button class="note">Do</button>
+        <button class="note">Think</button>
+        <button class="note">Note</button>
+        <button class="note">Journal</button>
+        <button class="switch-screen" data-screen="track-screen">Track</button>
+        <button class="switch-screen" data-screen="play-screen">Play</button>
+        <button class="switch-screen" data-screen="eat-screen">Eat</button>
+        <button class="switch-screen" data-screen="energy-screen">Energy</button>
+        <button id="reload">Reload</button>
+        </div>
+        <div class="screen" id="play-screen">
+            <button class="play">Persona 3</button>
+            <button class="play">Ni No Kuni</button>
+            <button class="play">Hobbit</button>
+            <button class="switch-screen"
+                    data-screen="main-screen">Back</button>
+        </div>
+        <div class="screen" id="energy-screen">
+            <button class="energy">5</button><br />
+            <button class="energy">4</button><br />
+            <button class="energy">3</button><br />
+            <button class="energy">2</button><br />
+            <button class="energy">1</button><br />
+            <button class="switch-screen"
+                    data-screen="main-screen">Back</button>
+        </div>
+        <div class="screen" id="eat-screen">
+            <button class="eat">Breakfast</button>
+            <button class="eat">Lunch</button>
+            <button class="eat">Dinner</button>
+            <button class="switch-screen"
+                    data-screen="main-screen">Back</button>
+        </div>
+        <div class="screen" id="track-screen">
+            <button class="update-qa">Routines</button>
+            <button class="update-qa">Subway</button>
+            <button class="update-qa">Coding</button>
+            <button class="update-qa">E1 Gen</button>
+            <button class="update-qa">Drawing</button>
+            <button class="update-qa">Cook</button>
+            <button class="update-qa">Kitchen</button>
+            <button class="update-qa">Tidy</button>
+            <button class="update-qa">Relax</button>
+            <button class="update-qa">Family</button>
+            <button class="update-qa">Walk Other</button>
+            <button class="update-qa">Nonfiction</button>
+            <button class="update-qa">Laundry</button>
+            <button class="update-qa">Sleep</button>
+            <button id="goToWeb">Web</button>
+            <button class="switch-screen" data-screen="main-screen">Back</button>
+        </div>
         <script>
-         $('#track').click(function() {
-             $('#feedback').html('Clicked on track');
-             performTask('Track');
+         function updateQuantifiedAwesome(category) {
+             performTask('Update QA', null, category);
+             hideScene('Test');
+         }
+
+         function showFeedback(s) {
+             $('#feedback').html(s);
+         }
+         function switchScreen(s) {
+             $('.screen').hide();
+             $('#' + s).show();
+         }
+
+         $('.switch-screen').click(function() {
+             switchScreen($(this).attr('data-screen'));
          });
+         function createEvernote(title, body) {
+             sendIntent('com.evernote.action.CREATE_NEW_NOTE', 'activity', '', '', 'none', '', '', ['android.intent.extra.TITLE:' + (title || ''), 'android.intent.extra.TEXT:' + (body || '')]);
+         }
+         $('.note').click(function() {
+             createEvernote($(this).text());
+         });
+         $('.energy').click(function() {
+             createEvernote('Energy', 'Energy ' + $(this).text() + ' ');
+             switchScreen('main-screen');
+         });
+         $('#reload').click(function() {
+             performTask('Reload Test');
+         });
+         $('.update-qa').click(function() {
+             updateQuantifiedAwesome($(this).attr('data-cat') || $(this).text());
+             hideScene('Test View');
+         });
+         $('#goToWeb').click(function() {
+             browseURL('http://quantifiedawesome.com');
+         });
+         $('.eat').click(function() {
+             updateQuantifiedAwesome($(this).text());
+             loadApp('MyFitnessPal');
+         });
+         $('.play').click(function() {
+             performTask('Play', null, $(this).text());
+         });
+
+         switchScreen('main-screen');
+
          </script>
     </body>
 </html>
