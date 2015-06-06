@@ -54,14 +54,15 @@
         </div>
         <div class="screen" id="eat-screen">
             <button class="eat">Breakfast</button>
-            <button class="eat">Lunch</button>
+            <button class="eat">Personal Lunch</button>
             <button class="eat">Dinner</button>
             <button class="switch-screen"
                     data-screen="main-screen">Back</button>
         </div>
         <div class="screen" id="track-screen">
             <button class="update-qa">Routines</button>
-            <button class="update-qa">Subway</button>
+            <button class="travel">Subway</button>
+            <button class="travel">Walk Other</button>
             <button class="update-qa">Coding</button>
             <button class="update-qa">E1 Gen</button>
             <button class="update-qa">Drawing</button>
@@ -70,8 +71,7 @@
             <button class="update-qa">Tidy</button>
             <button class="update-qa">Relax</button>
             <button class="update-qa">Family</button>
-            <button class="update-qa">Walk Other</button>
-            <button class="update-qa">Nonfiction</button>
+            <button class="social">Social</button>
             <button class="update-qa">Laundry</button>
             <button class="update-qa">Sleep</button>
             <button id="goToWeb">Web</button>
@@ -96,9 +96,16 @@
              $('#' + s).show();
          }
 
+         $('.travel').click(function() {
+             setWifi(false);
+             updateQuantifiedAwesome($(this).text());
+             loadApp('Maps');
+         });
+
          $('.switch-screen').click(function() {
              switchScreen($(this).attr('data-screen'));
          });
+
          function createEvernote(title, body) {
              sendIntent('com.evernote.action.CREATE_NEW_NOTE', 'activity',
                         '', '', 'none', '', '', ['android.intent.extra.TITLE:' + (title || ''), 'android.intent.extra.TEXT:' + (body || '')]);
@@ -127,7 +134,11 @@
          $('.play').click(function() {
              performTask('Play', null, $(this).text());
          });
-
+         $('.social').click(function() {
+             var people = prompt('With whom?');
+             updateQuantifiedAwesome('Social', people);
+             createEvernote('Social: ' + people);
+         });
          $('#library').click(function() {
              switchScreen('library-screen');
              showFeedback('Attempting to load...');
