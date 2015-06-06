@@ -16,16 +16,27 @@
         <div id="feedback"></div>
         <!-- For making it easy to track things -->
         <div class="screen" id="main-screen">
+            <button class="switch-screen" data-screen="adjust-screen">Adjust</button>
+            <button class="switch-screen" data-screen="track-screen">Track</button>
+            <button class="switch-screen" data-screen="play-screen">Play</button>
+            <button class="switch-screen" data-screen="eat-screen">Eat</button>
+            <button class="switch-screen" data-screen="energy-screen">Energy</button>
             <button class="note">Do</button>
             <button class="note">Think</button>
             <button class="note">Note</button>
             <button class="note">Journal</button>
             <button id="library">Library</button>
-            <button class="switch-screen" data-screen="track-screen">Track</button>
-            <button class="switch-screen" data-screen="play-screen">Play</button>
-            <button class="switch-screen" data-screen="eat-screen">Eat</button>
-            <button class="switch-screen" data-screen="energy-screen">Energy</button>
             <button id="reload">Reload</button>
+        </div>
+        <div class="screen" id="adjust-screen">
+            <button class="adjust">-5m</button>
+            <button class="adjust">-10m</button>
+            <button class="adjust">-15m</button>
+            <button class="adjust">-30m</button>
+            <button class="adjust">-60m</button>
+            <button class="adjust-manual">Manual</button>
+            <button class="switch-screen"
+                    data-screen="main-screen">Back</button>
         </div>
         <div class="screen" id="library-screen">
             <button class="update-qa">Nonfiction</button>
@@ -60,6 +71,7 @@
                     data-screen="main-screen">Back</button>
         </div>
         <div class="screen" id="track-screen">
+
             <button class="update-qa">Routines</button>
             <button class="travel">Subway</button>
             <button class="travel">Walk Other</button>
@@ -83,9 +95,15 @@
              if (note) {
                  category = category + '|' + note;
              }
-             browseURL('http://quantifiedawesome.com/time/track?category=' + encodeURIComponent(category) + '&auth_token=' + global('QATOKEN'));
+             browseURL('http://quantifiedawesome.com/time/track?category=' + encodeURIComponent(category) + '+' + encodeURIComponent(adjust) + '&auth_token=' + global('QATOKEN'));
+             updateAdjustInfo('');
              hideScene('Test View');
              wait(2000);
+         }
+
+         function updateAdjustInfo(a) {
+             adjust = a;
+             $('#adjust').html(adjust ? ('Adjust: ' + a) : 'Adjust');
          }
 
          function showFeedback(s) {
@@ -110,15 +128,29 @@
              sendIntent('com.evernote.action.CREATE_NEW_NOTE', 'activity',
                         '', '', 'none', '', '', ['android.intent.extra.TITLE:' + (title || ''), 'android.intent.extra.TEXT:' + (body || '')]);
          }
+
+         function saveToFile(title, body) {
+             performTask('Note', 1, title, body);
+         }
+
          $('.note').click(function() {
-             createEvernote($(this).text());
+             saveToFile($(this).text(), prompt('Body: '));
+             switchScreen('main-screen');
          });
          $('.energy').click(function() {
-             createEvernote('Energy', 'Energy ' + $(this).text() + ' ');
+             saveToFile('Energy', 'Energy ' + $(this).text() + ' ' + prompt('Note: '));
              switchScreen('main-screen');
          });
          $('#reload').click(function() {
              performTask('Reload Test');
+         });
+         $('#adjust-manual').click(function() {
+             updateAdjustInfo(prompt('Offset: '));
+             switchScreen('main-screen');
+         });
+         $('.adjust').click(function() {
+             updateAdjustInfo($(this).text());
+             switchScreen('main-screen');
          });
          $('.update-qa').click(function() {
              updateQuantifiedAwesome($(this).attr('data-cat') || $(this).text());
@@ -137,7 +169,7 @@
          $('.social').click(function() {
              var people = prompt('With whom?');
              updateQuantifiedAwesome('Social', people);
-             createEvernote('Social: ' + people);
+             saveToFile('Social', people);
          });
          $('#library').click(function() {
              switchScreen('library-screen');
@@ -170,12 +202,12 @@
                      } else {
                          updateQuantifiedAwesome('Play Fiction', $(this).text());
                      }
-                     createEvernote('Read: ' + $(this).text() + ' (' + $(this).attr('data-author') + ') -- ' + $(this).attr('data-dewey'));
                  });
              }, error: function(data, status, jq) {
                  showFeedback('Error: ' + data + ' - ' + status);
              }});
          });
+         var adjust = '';
          switchScreen('main-screen');
 
          </script>
