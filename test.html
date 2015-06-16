@@ -48,9 +48,10 @@
                     data-screen="main-screen">Back</button>
         </div>
         <div class="screen" id="play-screen">
-            <button class="play">Persona 3</button>
-            <button class="play">Ni No Kuni</button>
+            <button class="play">Jurassic</button>
             <button class="play">Hobbit</button>
+            <button class="play">Ni No Kuni</button>
+            <button class="play">Persona 3</button>
             <button class="switch-screen"
                     data-screen="main-screen">Back</button>
         </div>
@@ -85,7 +86,7 @@
             <button class="update-qa">Family</button>
             <button class="social">Social</button>
             <button class="update-qa">Laundry</button>
-            <button class="update-qa">Sleep</button>
+            <button class="run-task">Sleep</button>
             <button id="goToWeb">Web</button>
             <button class="switch-screen" data-screen="main-screen">Back</button>
         </div>
@@ -171,6 +172,10 @@
              updateQuantifiedAwesome('Social', people);
              saveToFile('Social', people);
          });
+         $('.run-task').click(function() {
+             performTask($(this).attr('data-task') || $(this).text());
+             switchScreen('main-screen');
+         });
          $('#library').click(function() {
              switchScreen('library-screen');
              showFeedback('Attempting to load...');
@@ -202,6 +207,7 @@
                      } else {
                          updateQuantifiedAwesome('Play Fiction', $(this).text());
                      }
+                     switchScreen('main-screen');
                  });
              }, error: function(data, status, jq) {
                  showFeedback('Error: ' + data + ' - ' + status);
