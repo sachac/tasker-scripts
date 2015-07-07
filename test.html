@@ -48,9 +48,10 @@
                     data-screen="main-screen">Back</button>
         </div>
         <div class="screen" id="play-screen">
-            <button class="play">Jurassic</button>
             <button class="play">Hobbit</button>
+            <button class="play">Jurassic</button>
             <button class="play">Ni No Kuni</button>
+            <button class="play">Persona 1</button>
             <button class="play">Persona 3</button>
             <button class="switch-screen"
                     data-screen="main-screen">Back</button>
@@ -97,11 +98,31 @@
              if (note) {
                  category = category + '|' + note;
              }
-             browseURL('http://quantifiedawesome.com/time/track?category=' + encodeURIComponent(category) + '+' + encodeURIComponent(adjust) + '&auth_token=' + global('QATOKEN'));
-             updateAdjustInfo('');
-             hideScene('Test View');
-             wait(2000);
+             $.ajax({url: 'http://quantifiedawesome.com/time/track.json?category=' + encodeURIComponent(category) + '+' + encodeURIComponent(adjust) + '&auth_token=' + global('QATOKEN'), success:
+                     function() {
+                         updateAdjustInfo('');
+                         hideScene('Test View');
+                         wait(2000);
+                     },
+                     error: function(a, b, c) {
+                         var now = new Date();
+                         var minutes = now.getMinutes();
+                         var hours = now.getHours();
+                         var time;
+                         if (minutes == 0) {
+                             time = hours + ':00';
+                         } else if (minutes < 10) {
+                             time = hours + ':0' + minutes;
+                         } else {
+                             time = hours + ':' + minutes;
+                         }
+                         browseURL('http://quantifiedawesome.com/time/track?category=' + encodeURIComponent(category) + '+' + time + '+' + encodeURIComponent(adjust) + '&auth_token=' + global('QATOKEN'));
+                         updateAdjustInfo('');
+                         hideScene('Test View');
+                         wait(2000);
+                     }});
          }
+
 
          function updateAdjustInfo(a) {
              adjust = a;
